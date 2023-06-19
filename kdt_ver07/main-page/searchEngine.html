@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>영화 검색창(임시로 표시한 타이틀)</title>
+<style>
+#search-result div + div {
+  margin-top: 50px;
+  border-top: 1px solid #ccc;
+  padding-top: 50px;
+}
+
+.ad {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  width: 150px;
+  height: 400px;
+  background-color: green;
+
+}
+
+
+
+</style>
+<body>
+<script src = "js/jquery-3.6.4.min.js">
+</script>
+
+<script>
+$(document).ready(function(){
+	// url 옆에 있는 movieNm 값을 가져옵니다.
+	$(window).on('load', function() {
+	    var movieNm = new URLSearchParams(window.location.search).get('movieNm');
+	    $("#search-input").val(movieNm);
+	    $("#search-form").submit();
+	});
+
+
+$("#search-form").submit(function(event){
+  event.preventDefault();
+  searchMovie();
+});
+	function searchMovie(){
+		
+/* 	$("#search-form").submit(function(event){ */
+		
+        // 검색어를 가져옵니다.
+           var movieNm = $("#search-input").val();
+        
+        
+        // OpenAPI에 요청을 보냅니다.
+     
+        $.ajax({
+            url: "https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json",
+            data: {
+                key: "78e093b548b2dceb6f0e5127b7df48b8",
+                movieNm: movieNm
+            },
+            type: "GET",
+            dataType: "json",
+            success: function(response){
+            	
+                // 필요한 정보를 추출해서 화면에 출력합니다.
+                var movieList = response.movieListResult.movieList;
+                var resultDiv = $("#search-result");
+                resultDiv.empty(); // 이전 검색 결과 삭제
+                var results = []; // 검색 결과를 저장할 배열
+                
+                for(var i=0; i<movieList.length; i++){
+                    // 검색어와 일치하는 영화인지 확인합니다.
+                    if(movieList[i].movieNm.indexOf(movieNm) >= 0){
+                        // 검색 결과 배열에 추가합니다.
+                        results.push(movieList[i]);
+                    }
+                }
+                // 검색 결과 배열을 제작연도를 기준으로 내림차순 정렬합니다.
+                results.sort(function(a, b) {
+                    return b.prdtYear - a.prdtYear;
+                });
+                // 검색 결과를 출력합니다.
+                if (results.length === 0) {
+                	alert("검색 결과가 없습니다.")
+                    /* resultDiv.append($("<p>").text("검색 결과가 없습니다.").css("color", "red")); */
+                } else {resultDiv.append($("<p>").text("'" + movieNm + "' 키워드를 검색한 결과입니다.").css({"font-weight":"bold","white-space":"pre-line"}));
+                    for(var i=0; i<results.length; i++){
+                    	var movieInfo = $("<div>");
+
+                    	  // 사각형 공간을 추가합니다.
+                    	  var imageBox = $("<div>").css({
+                    	    "border": "3px solid black",
+                    	    "display": "inline-block",
+                    	    "height": "280px",
+                    	    "margin-right": "25px",
+                    	    "width": "200px",
+                    	    "float" : "left",
+                    	  
+                    	  }).text("이미지를 추가할 공간입니다.");
+
+                    	  // 이미지를 추가합니다.
+                    	  if (results[i].thumbUrl) {
+                    		  var image = $("<img>").attr("src", results[i].thumbUrl).css({
+                    			    "max-height": "280px",
+                    			    "max-width": "200px",
+                            	    "margin-right": "25px",
+                    		  });
+
+                    	    imageBox.append(image);
+                    	  }
+
+                    	  // 사각형 공간과 영화 정보를 추가합니다.
+                    	movieInfo.append(imageBox);
+                        movieInfo.append($("<p>").text("영화 제목: " + results[i].movieNm));
+                        movieInfo.append($("<p>").text("영문명: " + results[i].movieNmEn));
+                        movieInfo.append($("<p>").text("제작연도: " + results[i].prdtYear));
+                        movieInfo.append($("<p>").text("개봉일: " + results[i].openDt));
+                        movieInfo.append($("<p>").text("제작국가: " + results[i].nationAlt));
+                        if (results[i].repGenreNm && results[i].repGenreNm[0]) {
+                            movieInfo.append($("<p>").text("영화 대표 장르: " + results[i].repGenreNm));
+                        } else {
+                            movieInfo.append($("<p>").text("영화 대표 장르: 정보 없음"));
+                        }
+                        if (results[i].directors && results[i].directors[0]) {
+                            movieInfo.append($("<p>").text("영화 감독명: " + results[i].directors[0].peopleNm));
+                        } else {
+                            movieInfo.append($("<p>").text("영화 감독명: 정보 없음"));
+                        }
+                        if (results[i].companys && results[i].companys[0]) {
+                            movieInfo.append($("<p>").text("제작사: " + results[i].companys[0].companyNm));
+                        } else {
+                            movieInfo.append($("<p>").text("제작사: 정보 없음"));
+                        }
+                        // 검색 결과를 화면에 추가합니다.
+                        resultDiv.append(movieInfo);
+                    }
+                }
+            }
+
+, // end of success:function(response)
+            error: function(xhr){
+                var resultDiv = $("#search-result");
+                resultDiv.empty(); // 이전 검색 결과 삭제
+                resultDiv.append($("<p>").text("검색에 실패했습니다.").css({"color":"red","font-weight":"red"}));
+            }
+            
+        });
+
+        event.preventDefault();
+	
+	/* }); */}
+});
+
+var br = "<br>";
+</script>
+</head>
+<body style="margin-left:30px; margin-right:30px">
+    <div style="display:flex; justify-content:space-between; align-items:center">
+        <h1 class="content" style="margin:30;">영화 검색창(임시로 표시한 타이틀)</h1>
+        <form id="search-form">
+            <input type="text" id="search-input" name="movieNm" placeholder="검색어를 입력하세요"
+                style="border-radius:7px; width: 300px; height:30px; font-size:16px; margin-right:10px;">
+            <input type="submit" value="검색"
+                style="width:50px; height:35px; font-size:16px; font-weight:bold; border-radius:3px; background-color:rgb(223,238,245)">
+        </form>
+    </div>
+    <div id = "borderline" style = "border-bottom:1px solid #ccc; padding-bottom:10px"></div>
+    <div id="search-result"></div>
+    <div id="resultDiv"></div>
+    <div class = ad>
+    <p>여기에 광고 이미지나 내용 등을 추가할 수 있습니다.</p>
+    </div>
+</body>
+
+</html>

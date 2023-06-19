@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>글쓰기 페이지</title>
+    <style>
+      /* 공통 스타일 */
+      .blog {
+        margin-bottom: 20px;
+      }
+      form {
+        border: 1px solid ;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      label {
+        display: inline-block;
+        width: 100px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      input[type=text],
+      
+      select,
+      textarea {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 2px solid ;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+      input[type=submit] {
+        background-color: maroon;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      input[type=submit]:hover {
+        background-color: blue;
+      }
+
+      /* 카테고리별 스타일 */
+      .movie-review,
+      .diary,
+      .my-movie-list,
+      .life-movie-list {
+        display: none;
+      }
+      .active {
+        display: block;
+      }
+  .cbutton {
+  background-color: pink;
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+  }
+
+  /* 마우스 오버시 배경색 변경 */
+  .cbutton:hover {
+    background-color: #3e8e41;
+  }
+</style>
+
+
+  </head>
+  <body>
+    <h1>글쓰기 페이지</h1>
+<h3>카테고리 하나를 골라주세요.</h3>
+   <ul>
+  <li><button  class="cbutton" onclick="showForm('movie-review')">영화 리뷰</button></li>
+  <li><button  class="cbutton" onclick="showForm('diary')">잡담</button></li>
+  <li><button  class="cbutton" onclick="showForm('my-movie-list')">나만의 영화 목록</button></li>
+  <li><button  class="cbutton" onclick="showForm('life-movie-list')">인생영화 목록</button></li>
+</ul>
+
+
+    <div class="blog movie-review active">
+      <h2>영화 리뷰</h2>
+      <form>
+        <label for="movie-title">영화 제목:</label>
+        <input type="text" id="movie-title" name="movie-title" required><br>
+ 이미지
+ <input type="file" id="image-file" accept="image/*">
+ <br>
+        <label for="movie-rating">평점(Max:10):</label>
+        <input  type="number" id="movie-rating" name="movie-rating" min="0" max="10" step="0.5" required><br>
+        <label for="movie-date">관람 날짜:</label><br>
+        <input type="date" id="movie-date" name="movie-date" required><br>
+
+        <label for="movie-review">리뷰:</label>
+        <textarea id="movie-review" name="movie-review" rows="5" required></textarea><br>
+
+        <input type="submit" value="리뷰 등록">
+      </form>
+    </div>
+
+    <div class="blog diary">
+      <h2>잡담</h2>
+      <form>
+        <label for="diary">제목:</label>
+        <input type="text" id="diary" name="diary">
+     
+        내용:
+        <textarea id="diary" name="diary" rows="5" required></textarea><br>
+	이미지
+        <input type="file" id="image-file" accept="image/*">
+        <input type="submit" value="게시물 올리기">
+      </form>
+    </div>
+
+   <div class="blog my-movie-list">
+      <h2>나만의 영화 목록</h2>
+      <form>
+      <input type="text" id="list-title" placeholder="영화제목">
+      <input type="text" id="list-review" placeholder="리뷰">
+    <label for="movie-date">관람 날짜:</label> <input type="date" id="list-date">
+      <br>
+     <label for="list-rating">평점(Max:10):</label>
+        <input  type="number" id="list-rating" name="movie-rating" min="0" max="10" step="0.5" required><br>
+      <input type="submit" value="추가" onclick="addMovie()"></input>
+    </form>
+    </div>
+
+    <div class="blog life-movie-list">
+      <h2>인생영화 목록</h2>
+      <form>
+        <label for="life-movie-title">영화 제목:</label>
+        <input type="text" id="life-movie-title" name="life-movie-title" required><br>
+
+        <label for="life-movie-date">개봉 연도:</label>
+        <input type="date" id="life-movie-date" name="life-movie-date"  required><br>
+
+        <label for="life-movie-director">감독:</label>
+        <input type="text" id="life-movie-director" name="life-movie-director" required><br>
+
+        <label for="life-movie-actor">주연 배우:</label>
+        <input type="text" id="life-movie-actor" name="life-movie-actor" required><br>
+
+        <label for="life-movie-reason">인생영화인 이유:</label>
+        <textarea id="life-movie-reason" name="life-movie-reason" rows="5" required></textarea><br>
+
+        <input type="submit" value="영화 추가">
+      </form>
+    </div>
+
+    <script>
+      function showForm(category) {
+        // 모든 폼 숨기기
+        const forms = document.querySelectorAll('.blog');
+        forms.forEach(form => {
+          form.classList.remove('active');
+        });
+
+        // 선택한 카테고리의 폼 보여주기
+        const selectedForm = document.querySelector(`.${category}`);
+        selectedForm.classList.add('active');
+      }
+      
+      function addMovie() {
+    	  const title = document.getElementById("list-title").value;
+    	  const review = document.getElementById("list-review").value;
+    	  const date = document.getElementById("list-date").value;
+    	  const rating = document.getElementById("list-rating").value;
+
+    	  if (title && description && date && rating) {
+    	    const movieList = document.getElementById("movie-list");
+    	    const newMovie = document.createElement("li");
+    	    newMovie.innerHTML = `
+    	      <div class="movie-info">
+    	        <span class="list-title">${title}</span>
+    	        <span class="list-review">${review}</span>
+    	        관람날짜
+    	        <span class="list-date">${date}</span>
+    	        별점
+    	        <span class="list-rating">${rating} 개</span>
+    	      </div>
+    	      <button class="delete-button">삭제</button>
+    	    `;
+    	    movieList.appendChild(newMovie);
+
+    	   //입력 필드 초기화
+    	    document.getElementById("list-title").value = "";
+    	    document.getElementById("list-review").value = "";
+    	    document.getElementById("list-date").value = "";
+    	    document.getElementById("list-rating").value = 1;
+
+    	    // 추가버튼후 이벤트리스너
+    	    const deleteButton = newMovie.querySelector(".delete-button");
+    	    deleteButton.addEventListener("click", function() {
+    	      movieList.removeChild(newMovie);
+    	    });
+    	  }
+    	}
+
+      
+      
+    </script>
+  </body>
+</html>
+        
